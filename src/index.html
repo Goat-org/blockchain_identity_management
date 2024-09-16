@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Identity Management</title>
+    <!-- Bootstrap -->
+    <link href="vendor/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.3.0/dist/web3.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        form {
+            margin: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input {
+            padding: 10px;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #user-data {
+            margin-top: 20px;
+            border: 1px solid #007bff;
+            padding: 10px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Identity Management</h1>
+
+    <h2>Submit Identity Form</h2>
+    <form id="identityForm">
+        <label for="fName">First Name:</label>
+        <input type="text" id="fName" name="fName" required>
+
+        <label for="lName">Last Name:</label>
+        <input type="text" id="lName" name="lName" required>
+
+        <label for="birthDate">Birth Date:</label>
+        <input type="text" id="birthDate" name="birthDate" required>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <h2>Retrieve User Data</h2>
+    <form id="retrieveForm">
+        <label for="userAddress">User Address:</label>
+        <input type="text" id="userAddress" name="userAddress" required>
+
+        <button type="submit">Get User Data</button>
+    </form>
+
+    <div id="user-data"></div>
+
+    <script>
+        // Check if Web3 is injected by MetaMask
+        if (typeof window.ethereum !== 'undefined') {
+            // Request account access
+            ethereum.request({ method: 'eth_requestAccounts' })
+            .then(accounts => {
+                console.log('Connected to MetaMask:', accounts[0]);
+            })
+            .catch(error => {
+                console.error('User denied account access', error);
+            });
+        } else {
+            alert('Please install MetaMask to interact with this application.');
+        }
+
+        // Initialize web3
+        const web3 = new Web3(window.ethereum);
+
+        // ABI of the smart contract
+        const abi = [
+            {
+                "constant": false,
+                "inputs": [
+                    {
+                        "name": "_fName",
+                        "type": "string"
+                    },
+                    {
+                        "name": "_lName",
+                        "type": "string"
+                    },
+                    {
+                        "name": "_birthDate",
+                        "type": "string"
+                    }
+                ],
+                "name": "submitForm",
+                "outputs": [],
+                "payable": false,
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "constant": true,
+                "inputs": [
+                    {
+                        "name": "_userAddress",
+                        "type": "address"
+                    }
+                ],
+                "name": "getUser",
+                "outputs": [
+                    {
+                        "name": "",
+                        "type": "string"
+                    },
+                    {
+                        "name": "",
+                        "type": "string"
+                    },
+                    {
+                        "name": "",
+                        "type": "string"
+                    }
+                ],
+                "payable": false,
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "constant": true,
+                "inputs": [],
+                "name": "taskCount",
+                "outputs": [
+                    {
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "payable": false,
+                "stateMutability": "view",
+                "type": "function"
+            }
+        ];
+
+        // Address of the deployed contract
+        const contractAddress = 'YOUR_CONTRACT_ADDRESS'; // Replace with your contract address
+
+        // Create contract instance
+        const contract = new web3.eth.Contract(abi, contractAddress);
+
+        // Submit form data
+        document.getElementById('identityForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const fName = document.getElementById('fName').value;
+            const lName = document.getElementById('lName').value;
+            const birthDate = document.getElementById('birthDate').value;
+
+            web3.eth.getAccounts().then(accounts => {
+                contract.methods.submitForm(fName, lName, birthDate).send({ from: accounts[0] })
+                .then(receipt => {
+                    console.log('Transaction receipt:', receipt);
+                    alert('Form submitted successfully!');
+                })
+                .catch(error => {
+                    console.error('Error submitting form:', error);
+                    alert('Error submitting form');
+                });
+            });
+        });
+
+        // Retrieve user data
+        document.getElementById('retrieveForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const userAddress = document.getElementById('userAddress').value;
+
+            contract.methods.getUser(userAddress).call()
+            .then(userData => {
+                const fName = userData[0];
+                const lName = userData[1];
+                const birthDate = userData[2];
+
+                document.getElementById('user-data').innerHTML = `
+                    <h3>User Data</h3>
+                    <p><strong>First Name:</strong> ${fName}</p>
+                    <p><strong>Last Name:</strong> ${lName}</p>
+                    <p><strong>Birth Date:</strong> ${birthDate}</p>
+                `;
+            })
+            .catch(error => {
+                console.error('Error retrieving user data:', error);
+                alert('Error retrieving user data');
+            });
+        });
+    </script>
+</body>
+</html>
