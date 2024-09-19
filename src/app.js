@@ -43,15 +43,16 @@ App = {
 
     // Load the smart contract
     loadContract: async () => {
-        const identityManagement = await $.getJSON('identity_management.json'); // Ensure this JSON file is present
-        App.contracts.identityManagement = TruffleContract(identityManagement);
-        App.contracts.identityManagement.setProvider(App.web3Provider);
+        const identityManagement = await $.getJSON('IdentityManagement.json'); // Ensure this JSON file is present
+        App.contracts.IdentityManagement = TruffleContract(identityManagement);
+        App.contracts.IdentityManagement.setProvider(App.web3Provider);
 
-        App.identityManagement = await App.contracts.identityManagement.deployed();
+        App.identityManagement = await App.contracts.IdentityManagement.deployed();
     },
 
     // Render the app
     render: async () => {
+        // Prevent double render
         if (App.loading) {
             return;
         }
