@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
     <title>Identity Management</title>
     <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.3.0/dist/web3.min.js"></script>
     <style>
@@ -113,7 +114,7 @@
                         "type": "address"
                     }
                 ],
-                "name": "getUser",
+                "name": "getUserData",
                 "outputs": [
                     {
                         "name": "",
@@ -149,7 +150,7 @@
         ];
 
         // Address of the deployed contract
-        const contractAddress = '0x44eCBB03b8f156c5cB024121E5a18d2c81CCf24A'; // Replace with your contract address
+        const contractAddress = '0xd2Fb79A6CEd1FE3237C08f88099C9da2655f9121'; // Replace with your contract address
 
         // Create contract instance
         const contract = new web3.eth.Contract(abi, contractAddress);
@@ -181,7 +182,7 @@
 
             const userAddress = document.getElementById('userAddress').value;
 
-            contract.methods.getUser(userAddress).call()
+            contract.methods.getUserData(userAddress).call()
             .then(userData => {
                 const fName = userData[0];
                 const lName = userData[1];

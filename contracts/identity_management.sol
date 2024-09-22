@@ -18,19 +18,25 @@ contract identity_management {
 
     // Function to submit the form data
     function submitForm(string memory _fName, string memory _lName, string memory _birthDate) public {
-        // Create a new user and store it in the mapping
+        // Increment the task count whenever a new user submits
+        taskCount++;
+
+        // Store user data in the mapping using the sender's address
         users[msg.sender] = User(_fName, _lName, _birthDate);
 
         // Emit an event for logging purposes
         emit UserSubmitted(msg.sender, _fName, _lName, _birthDate);
     }
 
-    // Function to retrieve user data
+    // Function to retrieve user data by address
     function getUser(address _userAddress) public view returns (string memory, string memory, string memory) {
         User memory user = users[_userAddress];
+
+        // Return the stored user data (fName, lName, birthDate)
         return (user.fName, user.lName, user.birthDate);
     }
 }
+
 
 
     
